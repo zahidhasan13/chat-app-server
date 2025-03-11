@@ -18,6 +18,7 @@ const userModel = new mongoose.Schema({
     },
 })
 
+// Signup
 userModel.statics.signup = async function(name, email, password){
     if(!validator.isEmail(email)){
         throw new Error("Invalid Email")
@@ -38,6 +39,21 @@ userModel.statics.signup = async function(name, email, password){
 
     const user = await this.create({name, email, password: hashPassword})
 
+    return user;
+}
+
+// Login
+userModel.statics.login = async function(email, password){
+    const user = await this.findOne({email})
+
+    if(!user){
+        throw new Error("Invalid User")
+    }
+
+    const match = await bcrypt.compare(password, user.password);
+    if(!match){
+        throw new Error("Incorrect Password")
+    }
     return user;
 }
 
