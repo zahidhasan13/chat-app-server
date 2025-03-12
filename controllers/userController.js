@@ -1,5 +1,6 @@
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose")
 
 const createToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "3d" });
@@ -40,8 +41,25 @@ const allUsers = async (req, res) => {
   }
 };
 
+// get Single user
+const getSingleUser = async (req, res) => {
+  const {id} = req.params;
+
+  if(!mongoose.Types.ObjectId.isValid(id)){
+    res.status(404).json({ message: "Invalid ID" });
+  }
+
+  try{
+    const user = await User.findById(id)
+    res.status(200).json(user)
+  }catch(err){
+    res.status(400).json({Error: err.mnessage})
+  }
+}
+
 module.exports = {
   signup,
   login,
   allUsers,
+  getSingleUser
 };
